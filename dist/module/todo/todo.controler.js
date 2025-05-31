@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTasks = exports.deleteTask = exports.updateTask = exports.deleteTodo = exports.addTask = exports.createTodo = exports.getTodo = exports.getTodos = void 0;
-const nanoid_1 = require("nanoid");
 const cloudinary_1 = __importDefault(require("../../service/cloudinary"));
 const todomodel_1 = __importDefault(require("../../db/models/todomodel"));
 // GET all todos for the user
@@ -39,11 +38,10 @@ const createTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(401).json({ message: "please add image" });
             return;
         }
-        const customId = (0, nanoid_1.nanoid)(5);
         const result = yield cloudinary_1.default.uploader.upload(req.file.path, {
-            folder: `Todo-list/task/${customId}`,
+            folder: `Todo-list/task`,
         });
-        req.filepath = `Todo-list/task/${customId}`;
+        req.filepath = `Todo-list/task `;
         //   const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
         const todo = yield todomodel_1.default.create({ user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id, title, image: {
                 secure_url: result.secure_url,
