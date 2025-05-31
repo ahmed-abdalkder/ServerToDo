@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const todo_controler_1 = require("./todo.controler");
+const auth_1 = require("../../middleware/auth");
+const multer_1 = require("../../service/multer");
+const router = express_1.default.Router();
+// const upload = multer({ dest: "uploads/" });
+router.get("/gettodos", (0, auth_1.auth)(), todo_controler_1.getTodos);
+router.get("/gettodo/:title", (0, auth_1.auth)(), todo_controler_1.getTodo);
+router.post("/", (0, auth_1.auth)(), (0, multer_1.multerhost)().single("image"), todo_controler_1.createTodo);
+router.post("/:id/task", (0, auth_1.auth)(), todo_controler_1.addTask);
+router.delete("/:id/task", (0, auth_1.auth)(), todo_controler_1.deleteTodo);
+router.put("/:id/task/:taskId", (0, auth_1.auth)(), todo_controler_1.updateTask);
+router.delete("/:id/task/:taskId", (0, auth_1.auth)(), todo_controler_1.deleteTask);
+router.get("/:id/tasks", (0, auth_1.auth)(), todo_controler_1.getTasks);
+exports.default = router;
