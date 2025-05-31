@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-
-  import { nanoid } from 'nanoid';
 import cloudinary from "../../service/cloudinary";
 import todoModel from "../../db/models/todomodel";
  
@@ -41,11 +39,11 @@ export const createTodo = async (req: CustomRequest , res: Response): Promise<vo
 
      return;
   }
-  const customId = nanoid(5)
+   
  
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: `Todo-list/task/${customId}`,});
-       req.filepath=`Todo-list/task/${customId}` 
+      folder: `Todo-list/task`,});
+       req.filepath=`Todo-list/task ` 
 //   const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
   const todo = await todoModel.create({ user: req.user?._id, title,image: {
     secure_url: result.secure_url,
