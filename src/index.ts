@@ -22,25 +22,25 @@ app.use(cors());
  
 
 
-i18next
-  .use(Backend)
-  .use((i18nextMiddleware as any).LanguageDetector)
-  .init({
-    fallbackLng: 'en',
-    backend: {
-      loadPath: path.join(__dirname, '/locales/{{lng}}/translation.json'),
-    },
-    detection: {
-      order: ['header'],
-      caches: false,
-    },
-    preload: ['en', 'ar'], 
-    initImmediate: false,
-  });
+// i18next
+//   .use(Backend)
+//   .use((i18nextMiddleware as any).LanguageDetector)
+//   .init({
+//     fallbackLng: 'en',
+//     backend: {
+//       loadPath: path.join(__dirname, '/locales/{{lng}}/translation.json'),
+//     },
+//     detection: {
+//       order: ['header'],
+//       caches: false,
+//     },
+//     preload: ['en', 'ar'], 
+//     initImmediate: false,
+//   });
 
  
-const middlewareHandle = (i18nextMiddleware as any).handle;
-app.use(middlewareHandle(i18next));
+// const middlewareHandle = (i18nextMiddleware as any).handle;
+// app.use(middlewareHandle(i18next));
 
 //  Static uploads
 app.use('/uploads', express.static('uploads'));
@@ -58,13 +58,15 @@ app.use("/subscriptions", subrouter);
 
  
 //  Test translation route
-app.get('/', (req, res) => {
-  const t = (req as any).t;
-  res.send({
-    message: t('task_reminder_title'),
-    language: (req as any).language,
-  });
+// app.get('/', (req, res) => {
+//   const t = (req as any).t;
+//   res.send({
+//     message: t('task_reminder_title'),
+//     language: (req as any).language,
+//   });
+// });
+ app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Server is up and running!' });
 });
- 
 //  Start Server
 app.listen(port, () => console.log(` Server listening on port ${port}`));
