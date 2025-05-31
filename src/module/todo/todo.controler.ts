@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { nanoid } from "nanoid";
+  import { nanoid } from 'nanoid';
 import cloudinary from "../../service/cloudinary";
 import todoModel from "../../db/models/todomodel";
  
@@ -33,6 +33,7 @@ export const getTodo = async (req: CustomRequest , res: Response): Promise<void>
 // CREATE a todo
 export const createTodo = async (req: CustomRequest , res: Response): Promise<void> => {
   try{
+   
   const { title } = req.body;
 
    if(!req.file){
