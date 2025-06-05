@@ -1,33 +1,45 @@
-import  { Document, Schema, model } from "mongoose";
+// This file defines the Mongoose schema and model for a "User" document.
+// It includes fields like name, email, and password, and automatically manages creation and update timestamps.
 
+import { Document, Schema, model } from "mongoose";
+// Importing required elements from Mongoose:
+// - Document: used to extend our interface for strong typing
+// - Schema: used to define the structure of the MongoDB document
+// - model: used to compile the schema into a usable model
+
+// Interface representing a User document in MongoDB
 export interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
+  name: string;        // The user's full name
+  email: string;       // The user's email address (must be unique)
+  password: string;    // The user's hashed password
+  createdAt: Date;     // Automatically generated timestamp for creation
+  updatedAt: Date;     // Automatically generated timestamp for last update
 }
 
+// Define the schema structure for a User
 const userSchema = new Schema<IUser>({
   name: {
     type: String,
-    required: true,
+    required: true,      // Name is required
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
+    required: true,      // Email is required
+    unique: true,        // Email must be unique across users
   },
   password: {
     type: String,
-    required: true,
+    required: true,      // Password is required (should be hashed before saving)
   },
 }, {
-  versionKey: false,
-  timestamps: true,
+  versionKey: false,      // Disables the default __v version field
+  timestamps: true,       // Enables automatic createdAt and updatedAt fields
 });
 
+// Compile the schema into a model that can be used throughout the app
 const userModel = model<IUser>("User", userSchema);
 
+// Export the compiled model so it can be imported in other parts of the application
 export default userModel;
+
 

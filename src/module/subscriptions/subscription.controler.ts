@@ -1,17 +1,29 @@
-import { Request, Response } from "express";
-import webpush from "web-push";
-import SubscriptionModel from "../../db/models/subscription.modle";
+// This file contains two controller functions:
+// 1. `saveSubscription` - saves a user's push subscription in the database.
+// 2. `sendNotifications` - sends push notifications to all stored subscriptions.
+// It uses the `web-push` library and a MongoDB model to handle notifications.
 
-const  PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
-const  PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+import { Request, Response } from "express";
+// Importing Express types for type-checking the request and response objects.
+
+import webpush from "web-push";
+// Importing the web-push library used to send push notifications via VAPID.
+
+import SubscriptionModel from "../../db/models/subscription.modle";
+// Importing the Mongoose model for storing subscription data in MongoDB.
+
+const PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+const PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+// Get the VAPID public and private keys from environment variables.
 
 webpush.setVapidDetails(
-  'mailto:your-email@example.com',
-   PUBLIC_KEY || '',
+  'mailto:your-email@example.com', // Replace with a valid email address for VAPID
+  PUBLIC_KEY || '',
   PRIVATE_KEY || ''
 );
+// Configure VAPID credentials used by the web-push service
 
- 
+// Extend Express request object to include authenticated user
 interface AuthRequest extends Request {
   user?: {
     _id: string;
@@ -19,34 +31,35 @@ interface AuthRequest extends Request {
   };
 }
 
- 
-
+// Controller to handle saving a user's push subscription
 export const saveSubscription = async (req: AuthRequest, res: Response): Promise<void> => {
   const subscription = req.body;
 
+  // Check if user is present in the request (set by auth middleware)
   if (!req.user) {
-   res.status(400).json({ error: "User not found in request" });
-    return ;
+    res.status(400).json({ error: "User not found in request" });
+    return;
   }
 
+  // Validate the subscription object
   if (!subscription || !subscription.endpoint) {
     res.status(400).json({ error: "Invalid subscription object" });
-     return 
+    return;
   }
 
   try {
-    
+    // Check if this subscription already exists for this user
     const exists = await SubscriptionModel.findOne({
       userId: req.user._id,
       endpoint: subscription.endpoint,
     });
 
     if (exists) {
-        res.status(200).json({ message: "Subscription already exists", subscription: exists });
-         return 
+      res.status(200).json({ message: "Subscription already exists", subscription: exists });
+      return;
     }
 
-    
+    // Save the new subscription in the database
     const newSubscription = new SubscriptionModel({
       ...subscription,
       userId: req.user._id,
@@ -60,17 +73,21 @@ export const saveSubscription = async (req: AuthRequest, res: Response): Promise
   }
 };
 
+// Controller to send push notifications to all saved subscriptions
 export const sendNotifications = async (req: Request, res: Response) => {
   const payload = JSON.stringify({
     title: "New Notification!",
-    body: "This is a test push message from the server ",
+    body: "This is a test push message from the server",
   });
+  // Define the content of the notification
 
   try {
     const subscriptions = await SubscriptionModel.find({});
+    // Fetch all subscriptions from the database
 
-    const results: { endpoint: string; success: boolean; error?: unknown}[] = [];
+    const results: { endpoint: string; success: boolean; error?: unknown }[] = [];
 
+    // Loop through each subscription and attempt to send a notification
     for (const sub of subscriptions) {
       try {
         await webpush.sendNotification(sub, payload);
@@ -81,9 +98,7 @@ export const sendNotifications = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ message: "Notifications sent", results });
-  } catch  {
+  } catch {
     res.status(500).json({ error: "Failed to send notifications" });
   }
 };
-
- 

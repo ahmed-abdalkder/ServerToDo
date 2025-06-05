@@ -1,15 +1,25 @@
+// This file handles the database connection logic for MongoDB using Mongoose.
+// It exports a reusable async function `connectDB` that connects to the database
+// using the connection string stored in the environment variable `DB_ONLINE`.
 
 import mongoose from "mongoose";
+// Import the Mongoose library, which is used to connect and interact with MongoDB databases.
 
+// Define an asynchronous function to connect to MongoDB
 const connectDB = async (): Promise<void> => {
   try {
-    await mongoose.connect ( process.env.DB_ONLINE as string);
+    // Attempt to connect to MongoDB using the connection string from the environment variable
+    await mongoose.connect(process.env.DB_ONLINE as string);
+
+    // If successful, log a confirmation message
     console.log("MongoDB Connected");
   } catch (error) {
+    // If an error occurs, catch it and log a meaningful error message
     console.error("DB Connection Failed:", error instanceof Error ? error.message : error);
   }
 };
 
+// Export the connection function to be used in other parts of the app (e.g., server.ts)
 export default connectDB;
 
 
