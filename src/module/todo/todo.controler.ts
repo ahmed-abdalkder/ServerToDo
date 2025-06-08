@@ -30,7 +30,7 @@ export const getTodos = async (req: CustomRequest, res: Response): Promise<void>
 // GET a single todo by its title
 export const getTodo = async (req: CustomRequest, res: Response): Promise<void> => {
   const { title } = req.params;
-  const todo = await todoModel.findOne({ title });
+  const todo = await todoModel.findOne({title });
   res.json(todo);
 };
 
