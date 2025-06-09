@@ -64,8 +64,16 @@ export const saveSubscription = async (req: AuthRequest, res: Response): Promise
       ...subscription,
       userId: req.user._id,
     });
+console.log("Before saving");
 
-    await newSubscription.save();
+try {
+  await newSubscription.save();
+  console.log("After saving");
+} catch (saveError) {
+  console.error("Error during save:", saveError);
+  res.status(500).json({ error: "Failed to save subscription", details: saveError });
+  return;
+}
 
     res.status(201).json({ message: "Subscription saved", subscription: newSubscription });
   } catch (error) {
@@ -102,3 +110,6 @@ export const sendNotifications = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to send notifications" });
   }
 };
+
+
+ 
