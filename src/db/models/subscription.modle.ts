@@ -24,7 +24,7 @@ export interface ISubscription extends Document {
 
 // Define the Mongoose schema for subscriptions
 const SubscriptionSchema = new Schema<ISubscription>({
-  endpoint: { type: String, required: true }, // Endpoint must be required
+  endpoint: { type: String, required: true,unique:true }, // Endpoint must be required
   keys: {
     p256dh: { type: String, required: true }, // Required encryption public key
     auth: { type: String, required: true },   // Required authentication secret

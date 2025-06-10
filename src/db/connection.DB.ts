@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 const connectDB = async (): Promise<void> => {
   try {
     // Attempt to connect to MongoDB using the connection string from the environment variable
-    await mongoose.connect(process.env.DB_ONLINE as string);
+    await mongoose.connect(process.env.URL_MONGO as string);
 
     // If successful, log a confirmation message
     console.log("MongoDB Connected");

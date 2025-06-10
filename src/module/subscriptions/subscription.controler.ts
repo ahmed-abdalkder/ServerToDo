@@ -41,11 +41,11 @@ export const saveSubscription = async (req: AuthRequest, res: Response): Promise
     return;
   }
 
-  // Validate the subscription object
-  if (!subscription || !subscription.endpoint) {
-    res.status(400).json({ error: "Invalid subscription object" });
-    return;
-  }
+  // // Validate the subscription object
+  // if (!subscription || !subscription.endpoint) {
+  //   res.status(400).json({ error: "Invalid subscription object" });
+  //   return;
+  // }
 
   try {
     // Check if this subscription already exists for this user
@@ -64,16 +64,11 @@ export const saveSubscription = async (req: AuthRequest, res: Response): Promise
       ...subscription,
       userId: req.user._id,
     });
-console.log("Before saving");
+   console.log("Before saving");
 
-try {
   await newSubscription.save();
   console.log("After saving");
-} catch (saveError) {
-  console.error("Error during save:", saveError);
-  res.status(500).json({ error: "Failed to save subscription", details: saveError });
-  return;
-}
+ 
 
     res.status(201).json({ message: "Subscription saved", subscription: newSubscription });
   } catch (error) {
