@@ -74,12 +74,16 @@ interface AuthRequest extends Request {
 
 export const auth = () => {
   return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    // تسجيل محتوى الهيدرز لفحص شكل التوكن القادم
+    console.log("Request Headers:", req.headers);
+
+    // محاولة استخراج التوكن من الهيدرز المختلفة
     const rawToken = req.headers.authorization || req.headers.token;
 
     let token: string | undefined;
 
     if (Array.isArray(rawToken)) {
-      token = rawToken[0];
+      token = rawToken[0]; // إذا كان مصفوفة خذ أول عنصر
     } else if (typeof rawToken === "string") {
       token = rawToken.startsWith("Bearer ") ? rawToken.split(" ")[1] : rawToken;
     }
@@ -114,4 +118,3 @@ export const auth = () => {
     next();
   };
 };
- 
