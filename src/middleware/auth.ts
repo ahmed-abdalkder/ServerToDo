@@ -1,6 +1,6 @@
-// This file defines an Express middleware function `auth` that authenticates users using a JWT token.
-// It checks for the token in the request headers, verifies it, finds the user in the database,
-// and attaches the authenticated user to the request object if valid.
+// // This file defines an Express middleware function `auth` that authenticates users using a JWT token.
+// // It checks for the token in the request headers, verifies it, finds the user in the database,
+// // and attaches the authenticated user to the request object if valid.
 
 // import jwt, { JwtPayload } from "jsonwebtoken";
 // // Importing jwt library for token verification and decoding.
@@ -64,58 +64,45 @@
 // };
 
 
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
+ import jwt, { JwtPayload } from "jsonwebtoken";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import userModel, { IUser } from "../db/models/usermodel";
 
+// ✅ تعريف AuthRequest ليضيف user إلى req
 interface AuthRequest extends Request {
   user?: IUser;
 }
 
-export const auth = () => {
-  return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
-    // تسجيل محتوى الهيدرز لفحص شكل التوكن القادم
-    console.log("Request Headers:", req.headers);
+ 
+export const auth = (): RequestHandler => {
+  return async (req, res, next) => {
+    const authReq = req as AuthRequest;
 
-    // محاولة استخراج التوكن من الهيدرز المختلفة
-    const rawToken = req.headers.authorization || req.headers.token;
-
-    let token: string | undefined;
-
-    if (Array.isArray(rawToken)) {
-      token = rawToken[0]; // إذا كان مصفوفة خذ أول عنصر
-    } else if (typeof rawToken === "string") {
-      token = rawToken.startsWith("Bearer ") ? rawToken.split(" ")[1] : rawToken;
-    }
+    const token = req.headers.token as string;
 
     if (!token) {
-      res.status(401).json({ error: "token_not_found" });
+      res.status(401).json({ message: "token_not_found" });
       return;
     }
-
-    let decoded: JwtPayload;
 
     try {
-      decoded = jwt.verify(token, process.env.JWT_KEY as string) as JwtPayload;
-    } catch {
-      res.status(401).json({ error: "invalid_token" });
-      return;
+      const decoded = jwt.verify(token, process.env.JWT_KEY as string) as JwtPayload;
+
+      if (!decoded?.id) {
+        res.status(401).json({ message: "token_invalid_or_missing_id" });
+        return;
+      }
+
+      const user = await userModel.findById(decoded.id);
+      if (!user) {
+        res.status(401).json({ message: "user_not_found" });
+        return;
+      }
+
+      authReq.user = user;
+      next();  
+    } catch (error) {
+      res.status(401).json({ message: "invalid_token" });
     }
-
-    
-    if (!decoded?.id) {
-      res.status(401).json({ error: "invalid_token_payload" });
-      return;
-    }
-
-    const user = await userModel.findById(decoded.id);
-    if (!user) {
-      res.status(401).json({ error: "user_not_found" });
-      return;
-    }
-
-    req.user = user;
-
-    next();
   };
 };

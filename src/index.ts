@@ -34,11 +34,15 @@ import subrouter from './module/subscriptions/sub.routes';
 
 import notificationScheduler from './notificationScheduler';
 // Import the notification scheduler module responsible for scheduled notification tasks.
+import passport from 'passport';
+import session from 'express-session';
+import './middleware/googleAuth';
+import { Request, Response } from 'express';
 
 const app = express();
 // Create an instance of the Express app.
 
-const port = 3000;
+const port = 5000;
 // Define the port the server will listen on.
 
 app.use(express.json());
@@ -49,7 +53,37 @@ app.use(cors());
 
 connectDB();
 // Connect to the MongoDB database.
+app.use(
+  session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: false, // خليه true فقط في production مع HTTPS
+      maxAge: 1000 * 60 * 60 * 24, // يوم
+    },
+  })
+);
 
+// 🟦 إعداد passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+ 
+app.get(
+  '/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+ 
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req: Request, res: Response) => {
+    const user = req.user as unknown as { token: string };
+    res.redirect(`${process.env.FRONTEND_URL}?token=${user.token}`);
+  }
+);
 app.use('/uploads', express.static('uploads'));
 // Serve static files from the 'uploads' directory for uploaded files (e.g., images).
 

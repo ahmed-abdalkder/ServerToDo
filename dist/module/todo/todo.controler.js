@@ -1,4 +1,7 @@
 "use strict";
+// // This controller handles CRUD operations for a To-Do list application.
+// // It supports creating todos (with image upload), fetching, updating, deleting todos,
+// // and managing tasks within each todo. Each operation is user-specific.
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,21 +18,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTasks = exports.deleteTask = exports.updateTask = exports.deleteTodo = exports.addTask = exports.createTodo = exports.getTodo = exports.getTodos = void 0;
 const cloudinary_1 = __importDefault(require("../../service/cloudinary"));
 const todomodel_1 = __importDefault(require("../../db/models/todomodel"));
-// GET all todos for the user
+// Controller: GET all todos for the authenticated user
 const getTodos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const todos = yield todomodel_1.default.find({ user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id });
     res.json(todos);
 });
 exports.getTodos = getTodos;
-// GET a todo by title
+// Controller: GET a single todo by its title
 const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { title } = req.params;
     const todo = yield todomodel_1.default.findOne({ title });
     res.json(todo);
 });
 exports.getTodo = getTodo;
-// CREATE a todo
+// Controller: CREATE a new todo with image upload
 const createTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -41,12 +44,15 @@ const createTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const result = yield cloudinary_1.default.uploader.upload(req.file.path, {
             folder: `Todo-list/task`,
         });
-        req.filepath = `Todo-list/task `;
-        //   const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-        const todo = yield todomodel_1.default.create({ user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id, title, image: {
+        const todo = yield todomodel_1.default.create({
+            user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id,
+            title,
+            image: {
                 secure_url: result.secure_url,
                 public_id: result.public_id,
-            }, tasks: [] });
+            },
+            tasks: [],
+        });
         res.status(201).json(todo);
     }
     catch (error) {
@@ -60,7 +66,7 @@ const createTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createTodo = createTodo;
-// ADD a task to a todo
+// Controller: ADD a new task to a specific todo
 const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
@@ -75,7 +81,7 @@ const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json(todo);
 });
 exports.addTask = addTask;
-// DELETE a todo
+// Controller: DELETE a todo by ID
 const deleteTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
@@ -87,7 +93,7 @@ const deleteTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     res.json({ message: "To-Do deleted successfully", todo });
 });
 exports.deleteTodo = deleteTodo;
-// UPDATE a task in a todo
+// Controller: UPDATE a specific task within a todo
 const updateTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id, taskId } = req.params;
@@ -110,7 +116,7 @@ const updateTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     res.status(200).json(todo);
 });
 exports.updateTask = updateTask;
-// DELETE a task from a todo
+// Controller: DELETE a specific task from a todo
 const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id, taskId } = req.params;
@@ -124,7 +130,7 @@ const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     res.status(200).json(todo);
 });
 exports.deleteTask = deleteTask;
-// GET all tasks from a todo
+// Controller: GET all tasks from a specific todo
 const getTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;

@@ -14,22 +14,41 @@ export interface IUser extends Document {
   password: string;    // The user's hashed password
   createdAt: Date;     // Automatically generated timestamp for creation
   updatedAt: Date;     // Automatically generated timestamp for last update
+  role:string;
+  googleId:string;
+  picture:string;
 }
 
 // Define the schema structure for a User
 const userSchema = new Schema<IUser>({
-  name: {
+   
+    name: {
     type: String,
-    required: true,      // Name is required
+     trim:true,
+    required: true,
+
   },
   email: {
     type: String,
-    required: true,      // Email is required
-    unique: true,        // Email must be unique across users
+    required: true,
+    unique: true,
+    trim:true
   },
   password: {
+    type: String 
+  },
+  googleId: {
+    type: String
+    
+  },
+  picture: {
+    type: String
+     
+  },
+   role: {
     type: String,
-    required: true,      // Password is required (should be hashed before saving)
+    enum: ["user","admin"],
+    default: 'user'
   },
 }, {
   versionKey: false,      // Disables the default __v version field
